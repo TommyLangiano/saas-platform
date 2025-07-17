@@ -8,13 +8,20 @@ function App() {
 
   useEffect(() => {
     // Usa la variabile d'ambiente invece dell'URL hardcoded
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5050'
+    const apiUrl = process.env.REACT_APP_API_URL || 'https://httpbin.org'
     
-    axios.get(`${apiUrl}/api/hello`)
-      .then(res => setMessage(res.data.message))
+    console.log('🔍 API URL configurato:', apiUrl)
+    console.log('🔍 Tutte le env vars:', process.env)
+    
+    // Test con httpbin per verificare che la connessione funzioni
+    axios.get(`${apiUrl}/get`)
+      .then(res => {
+        console.log('✅ Risposta API:', res.data)
+        setMessage(`✅ Connessione riuscita! API: ${apiUrl}`)
+      })
       .catch(err => {
-        console.error('Errore connessione backend:', err)
-        setMessage('❌ Backend non raggiungibile')
+        console.error('❌ Errore connessione backend:', err)
+        setMessage(`❌ Backend non raggiungibile: ${apiUrl}`)
       })
   }, [])
 
@@ -24,7 +31,19 @@ function App() {
       <p><strong>Risposta dal backend:</strong> {message}</p>
       <p>✅ AWS Amplify configurato!</p>
       <p>🌐 URL: {window.location.href}</p>
-      <p>🔗 API configurata per: {process.env.REACT_APP_API_URL || 'localhost:5050'}</p>
+      <p>🔗 API configurata per: {process.env.REACT_APP_API_URL || 'https://httpbin.org (fallback)'}</p>
+      <p>🔍 Debug - Tutte le env vars disponibili:</p>
+      <pre style={{background: '#f5f5f5', padding: '10px', fontSize: '12px'}}>
+        {JSON.stringify(
+          Object.keys(process.env)
+            .filter(key => key.startsWith('REACT_APP_'))
+            .reduce((obj, key) => {
+              obj[key] = process.env[key];
+              return obj;
+            }, {}), 
+          null, 2
+        )}
+      </pre>
     </div>
   )
 }
